@@ -1,0 +1,230 @@
+% 从excel中读入数据到命令行
+[number,txt,raw]=xlsread('test.xlsx')
+
+% 看矩阵分布
+spy(S)
+spy(S,'*',16) %用符号*、字号16看矩阵分布
+
+% X,Y为同维向量时，绘制以X、Y元素为横，纵坐标的一条线；X为列向量，Y为矩阵时，按Y列绘制多条不同颜色的曲线，X为这些曲线共同的横坐标
+plot(X,Y)
+plot(X,Y,LineSpec) %参数LineSpec用于指出线条的类型，标记符号和颜色
+plot(X1,Y1,LineSpec1,X2,Y2,LineSpec2...) %当Xi和Yi成对出现时，将分别按顺序取两数据Xi和Yi进行画图
+plot(..., ‘PropertyName’,PropertyValue,...)%对图形对象中指定的属性进行设置
+% Example 1
+x=0:0.1:2;
+y=1+exp(x);
+plot(x,y, '-+b')
+% Example 2
+t=[-pi:pi/100:2*pi]'; %t是列向量
+k=[1:6]; 
+y=sin(t)*k; %y是矩阵
+plot(t,y)
+
+% plot矩阵绘图,直接将矩阵的数据绘制在图形窗体中，此时plot函数将矩阵的每一列数据作为一条曲线绘制在窗体中
+% Example
+A=pascal(5);
+plot(A)
+
+% 给x、y轴添加标签
+xlabel('string1');
+ylabel('string2');
+% 给图像命名
+title('string3');
+% 右上角用来标识指明变量
+legend('string1','string2',...)
+% Example
+t=0:pi/100:pi;
+y1=sin(t);
+y2=sin(-t);
+y3=sin(t).*sin(5*t);
+plot(t,y1, '-.r',t,y2, '-.k',t,y3, '-bo');
+xlabel('时间');
+ylabel('幅度');
+title('波形及包络线');
+legend('y=sint', 'y=-sint', 'y=sinsin5t')
+
+%清除所有当前图像窗口
+clf
+
+% 叠加绘图
+hold on %保留当前图像与当前坐标轴的属性值，使用后面的图形命令只能在当前存在的坐标轴中增加图形
+hold off %在绘制新图形之前，重新设置坐标轴的属性为默认值，关闭hold on功能
+hold %在on和off之间切换，即在增加图形和覆盖图形之间切换
+hold all %保留当前颜色和线型，在绘制随后的图形时使用当前颜色和线型
+% Example
+x=linspace(0,2*pi,60);
+y=sin(x);
+plot(x,y,'b');
+xlabel('自变量'),ylabel('因变量');
+hold on;
+z=0.5*sin(x);
+plot(x,z,'k:');
+legend('y=sin(x)','z=0.5*sin(x)');
+hold off
+
+% 在同一图形框内布置几幅独立的子图
+subplot(m,n,k) %将一个图形窗口分成m*n个小窗口（子图），k是子图的编号。序号原则是：左上方的为第一幅，然后向右、向下依次排好
+subplot('Position',[left bottom width height])  %在由4个元素指定的位置上创建坐标轴
+% Example
+x=-4:0.1:4;
+subplot(2,2,1);
+y1=1/sqrt(2*pi)*exp(-1/2*x.^2),plot(x,y1);
+xlabel('变量x'),ylabel('变量密度y'),title('正态分布N(0,1)');
+subplot(2,2,2);
+y2=1/sqrt(2*pi)/2*exp(-1/2/4*x.^2),plot(x,y2);
+xlabel('变量x'),ylabel('概率密度y');
+title('正太分布N(0,4)');
+subplot(2,2,3);
+y3=1/sqrt(2*pi)/0.5*exp(-1/2/(0.5^2)*(x-1).^2),plot(x,y3);
+xlabel('变量x'),ylabel('概率密度y'),title('正太分布N(1,1/4)');
+subplot(2,2,4);
+y4=1/sqrt(2*pi)/0.5*exp(-1/2/(0.5^2)*(x+1).^2),plot(x,y4);
+xlabel('变量x'),ylabel('概率密度y'),title('正太分布N(-1,1/4)')
+
+% 多个图形窗口
+figure(n) %创建新的图形窗口或显示当前图形窗口。n是这个窗口的编号，figure(1)是默认值，不需要声明
+t=-4:0.1:4;x=sin(t);plot(t,x,'b^')
+t=-4:0.1:4;x=sin(t);plot(t,x,'b^')
+xlabel('t');ylabel('x');title('函数x=sint的图形');
+figure(2)
+y=cos(t);plot(t,y,'kp');
+xlabel('t');ylabel('y');title('函数y=cost的图形');
+figure(3)
+z=sin(t).*cos(t);plot(t,z,'kh')
+xlabel('t');ylabel('z');title('函数z=sincost的图形')
+
+% 双纵坐标图
+plotyy(x1,y1,x2,y2) %绘制双纵坐标二维图形，x1和y1所对应的图形的纵坐标标注在图形的左边，x2和y2所对应图形的纵坐标标注在图形的右边
+% Example
+x=0:0.1:4;y=x.*sin(x);s=sin(x)-x.*cos(x);
+plotyy(x,y,x,s);
+text(0.5,0,'\fontsize{14}\ity=xsinx')
+text(2.5,3.5,['\fontsize{14}\its=','{\fontsize{16}  \int_{\fontsize{8}0}^{ x}}','\fontsize{14}\itxsinxdx'])
+
+% 泛函绘图
+% 在指定的范围limits内绘制出函数名为function的一元函数图像
+% 其中limits是一个指定x轴的向量[xmin xmax],或者是x轴和y轴的范围向量[xmin xmax ymin ymax]，Tol为相对允许误差，默认值为2e-3
+% 函数function必须是M函数文件或者只包含一个变量x的函数字符串
+% 用指定的线型LineSpec绘制出函数function
+fplot('function',limits,LineSpec)
+fplot('function',limits,LineSpec,tol)
+fplot('exp(2*x)',[0 2],'o')
+
+% 隐函数函数绘图f = f(x,y)
+ezplot(f) %对于显函数f=f(x),在-pi<=x<=pi(默认)上绘制f(x)的图形；对于隐函数f=f(x,y)，在[-2pi<=x<=2pi,-2pi<=y<=2pi]（默认）上绘制函数f(x,y)的图形
+ezplot(f,[min,max]) %在指定的范围min<=x<=max绘制函数f=f(x)的图形
+ezplot(f,[xmin,xmax],fign) %在指定标号fign的窗口中，指定的范围。[xmin,xmax]内绘制函数f=f(x)的图形
+ezplot(f,[xmin,xmax,ymin,ymax]) %在[xmin<=x<=xmax, ymin<=y<=ymax]绘制f(x,y)=0的图形
+% Example
+subplot(2,2,1);
+ezplot('x^2+y^2-9');axis equal;
+subplot(2,2,2);
+ezplot('x^3+y^3-5*x*y+1/5')
+subplot(2,2,3);
+ezplot('cos(tan(pi*x))',[0,1]);
+subplot(2,2,4);
+ezplot('8*cos(t)','4*sqrt(2)*sin(t)',[0,2*pi]);
+
+% 3维图形的绘制
+% 1)meshgrid是将向量转换成网络坐标的矩阵函数
+[X,Y]=meshgrid(x,y) %生成二元函数z=f(x,y)在XY平面上的矩阵定义域数据点矩阵X和Y
+[X,Y,Z]=meshgrid(x,y,z) %生成三元函数u=f(x,y,z)中立方体定义域中的数据点矩阵X,Y,Z
+% 2)plot3 三维曲线
+plot3(X,Y,Z,LineSpec) %X,Y,Z为同维向量组，分别表示曲线上点集的横坐标，纵坐标，和函数值,常用来绘制单变量的参数曲线x=x(t),y=y(t)与z=z(t)的三维函数图形
+% 3)mesh 画网格曲面 网格图（mesh）中线条有颜色，线条间补面无颜色
+mesh(X,Y,Z,C) %X,Y为坐标轴取值向量，Z为X，Y平面上的函数值矩阵，C为色彩向量，当C固定时，网格图的色彩随Z的高度而改变
+% Example
+x=-3:0.1:3;y=1:0.1:6;
+[X,Y]=meshgrid(x,y);
+Z=(X+Y).^2;
+mesh(X,Y,Z)
+% 4)表面图 surf 曲面图（surf）的线条都是黑色的，线条间补面有颜色
+surf(X,Y,Z)  %X,Y,Z为同维向量组，分别表示曲线上点集的横坐标、纵坐标和函数值，绘制出数据点(X,Y,Z)表示的曲面
+% Example
+t=linspace(0,pi/2,25);
+p=linspace(0,pi/2,25);
+[theta,phi]=meshgrid(t,p);
+x=cos(theta).*cos(phi);
+y=cos(theta).*sin(phi);
+z=sin(theta);
+surf(x,y,z)
+% 5)set函数
+%set(句柄,属性名1,属性值1,属性名2,属性值2,...)
+% Example
+[fia,theta]=meshgrid([linspace(0,pi/2,5),pi/2])
+x=cos(theta).*cos(fia);
+y=cos(theta).*sin(fia);
+z=sin(theta);
+shading interp %在flat的基础上进行色彩的插值处理，使色彩平滑过渡
+%shading flat 在faceted的基础上去掉图上的网格线
+%no shading 一般的默认模式,即shading faceted
+mesh(x,y,z)
+set(mesh(x,y,z),'FaceColor','k','EdgeColor','none');
+shading interp;
+alpha(0.2);
+hold on
+% 6)alpha函数控制色彩的浓稠度
+alpha(0.5)  %色彩的浓稠度就减少了一半。默认情况下是1
+
+% 其他形式的线性直角坐标图
+%bar(x,y,选项) 条形图
+%stairs(x,y,选项) 阶梯图
+%stem(x,y,选项) 杆图
+%fill(x1,y1,选项1,x2,y2,选项2,...)  填充图
+% Example
+x=0:0.35:7;
+y=2*exp(-0.5*x);
+subplot(2,2,1);bar(x,y,'g');
+title('bar(x,y,''g'')');axis([0, 7, 0 ,2]);
+subplot(2,2,2);fill(x,y,'r');
+title('fill(x,y,''r'')');axis([0, 7, 0 ,2]);
+subplot(2,2,3);stairs(x,y,'b');
+title('stairs(x,y,''b'')');axis([0, 7, 0 ,2]);
+subplot(2,2,4);stem(x,y,'k');
+title('stem(x,y,''k'')');axis([0, 7, 0 ,2]);
+
+% 极坐标图
+% polar(theta，rho，选项) theta为极坐标极角，rho为极径，选项的内容和plot函数相似
+% Example
+theta=0:0.01:2*pi;
+rho=sin(3*theta).*cos(5*theta);
+polar(theta,rho,'r');
+
+% 瀑布图和等高线图
+subplot(1,2,1);
+[X,Y,Z]=peaks(30);
+% 瀑布图
+waterfall(X,Y,Z);
+xlabel('XX');ylabel('YY');zlabel('ZZ');
+subplot(1,2,2);
+% 等高线图
+contour3(X,Y,Z,12,'k'); %12代表高度的等级数
+xlabel('XX');ylabel('YY');zlabel('ZZ');
+
+% 三维图视角处理
+view(az,el); %az为方位角，el为仰角，它们均以度为单位;系统默认的视点定义为方位角为-37.5度，仰角30度
+%MATLAB提供了一个peaks函数，可产生一个凹凸有致的曲面，包含了三个局部极大点及三个局部极小点
+%Example
+subplot(2,2,1);mesh(peaks);
+view(-37.5,30);
+title('1');
+subplot(2,2,2);mesh(peaks);
+view(0,90);
+title('2');
+subplot(2,2,3);mesh(peaks);
+view(90,0);
+title('3');
+subplot(2,2,4);mesh(peaks);
+view(-7,-10);
+title('4');
+
+% 裁剪图像：将图形中需要裁剪部分对应的函数值设置成NaN，这样在绘制图形时，函数值为NaN的部分将不显示出来
+% Example
+x=0:pi/10:4*pi;
+y=sin(x);
+i=find(abs(y)>0.5);
+x(i)=NaN;
+plot(x,y);
+
+% 添加色标
+colorbar
